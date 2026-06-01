@@ -862,14 +862,22 @@
 
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-        // Form submission — placeholder con alert, da collegare a Stripe
+        // Form submission — redirect to Stripe Payment Link
+        const STRIPE_LINK = 'https://buy.stripe.com/9B69AT6dxfzd4ph7ao9R60j';
+
         document.getElementById('registration-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
-            console.log('Registration data:', data);
-            alert('🎉 Quasi fatto! Il sistema di pagamento sarà attivato a breve. Per ora i tuoi dati sono stati raccolti: ' + data.name + ' ' + data.surname + ' — ' + data.mode);
-            // TODO: integrate Stripe Checkout here
+
+            // Build Stripe URL with prefilled email + client reference for tracking
+            const params = new URLSearchParams();
+            params.set('prefilled_email', data.email);
+            params.set('client_reference_id', `${data.name}_${data.surname}_${data.mode}`);
+
+            const stripeUrl = STRIPE_LINK + '?' + params.toString();
+            console.log('Redirecting to Stripe:', stripeUrl);
+            window.location.href = stripeUrl;
         });
 
         // Smooth scroll for anchor links
